@@ -38,6 +38,17 @@ def getBuildParameters(base, bits) {
         'buildArguments': [],
         'env': ['CXXFLAGS': "-m${bits}", 'CFLAGS': "-m${bits}", 'LDFLAGS': "-m${bits}"]
     ]
+  } else if (Os.isFamily(Os.FAMILY_UNIX) && Os.isArch('arm')) {
+        bitSuffix = 'arm'
+        bits = 'float-abi=hard'
+        
+        return [
+        'identifier': "linux-${bitSuffix}",
+        'library': "lib${base}.so",
+        'setupArguments': ["-DBITZ:STRING=${bits}"],
+        'buildArguments': [],
+        'env': ['CXXFLAGS': "-m${bits}", 'CFLAGS': "-m${bits}", 'LDFLAGS': "-m${bits}"]
+    ]
   } else {
     return [
         'identifier': "linux-${bitSuffix}",
@@ -62,6 +73,9 @@ def createBuildTask(tasksHolder, config, bits) {
   def taskBase = "${config.name}-${bits}"
 
   if (Os.isFamily(Os.FAMILY_MAC) && bits != 64) {
+    return
+  }
+  if (Os.isFamily(Os.FAMILY_UNIX) && Os.isArch('arm') && bits != 32) {
     return
   }
 
